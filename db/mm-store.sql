@@ -1,8 +1,5 @@
 -- mm-store/db/mm-store.sql
 
--- Create the marketmaster database
-CREATE DATABASE marketmaster;
-
 \connect marketmaster;
 
 -- Create a table for stores
@@ -17,5 +14,6 @@ CREATE TABLE IF NOT EXISTS store (
 
 -- Optionally, add indexes for commonly queried columns
 CREATE INDEX IF NOT EXISTS idx_stores_id ON store(id);
+CREATE INDEX IF NOT EXISTS idx_stores_cnpj ON store(cnpj);
 CREATE INDEX IF NOT EXISTS idx_stores_addressid ON store(addressid);
 CREATE INDEX IF NOT EXISTS idx_stores_ownerid ON store(ownerid);
