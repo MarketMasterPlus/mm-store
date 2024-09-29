@@ -96,6 +96,7 @@ def init_routes(api):
             return '', 204
 
     @store_ns.route('/city/<string:city>')
+    @store_ns.expect(query_parser)  # Use the parser for input validation and documentation
     @store_ns.doc('list_stores_by_city')
     class StoreCity(Resource):
         @store_ns.marshal_list_with(store_model)
@@ -105,6 +106,22 @@ def init_routes(api):
             address_response = requests.get(address_url)
             if address_response.status_code == 200:
                 address_ids = [str(address['id']) for address in address_response.json()]
-                stores = Store.query.filter(Store.addressid.in_(address_ids)).all()
+                args = query_parser.parse_args()  # Parse the query parameters
+                name_query = args.get('name')
+                cnpj_query = args.get('cnpj')
+                addressid_query = args.get('addressid')
+                ownerid_query = args.get('ownerid')
+                query = Store.query
+
+                if name_query:
+                    query = query.filter(Store.name.ilike(f"%{name_query.lower()}%"))
+                if cnpj_query:
+                    query = query.filter(Store.cnpj.ilike(f"%{cnpj_query.lower()}%"))
+                if addressid_query:
+                    query = query.filter(Store.addressid == addressid_query)
+                if ownerid_query:
+                    query = query.filter(Store.ownerid == ownerid_query)
+
+                stores = query.filter(Store.addressid.in_(address_ids)).all()
                 return stores
             return [], 404
